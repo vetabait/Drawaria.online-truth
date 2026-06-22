@@ -69,6 +69,8 @@ Snapshots - this is a function, when all data about room (System chat messages a
 
 drawaria.online/snapshot/(timestamp).(server).(Dont know yet, 6 numbers)
 
+full information about snapshots you can see in next files.
+
 
 ---------------------- CUTTED THINGS ----------------------
 
@@ -111,7 +113,8 @@ You can also use these commands in chat, i will show some examples:
 and more...
 
 if player without rigts will write it, the server will answer: rcon msg: premission
-It means that player just cant use them, because he doesnt have rights
+It means that player just cant use them, because he doesnt have rights.
+It makes sense that moderators can use their commands though chat AND the modpanel site.
 
 
 
