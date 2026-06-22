@@ -1,0 +1,705 @@
+Player sniper: This is a nice tool which can find the your wanted player without switching rooms, because bot will do it insted of you
+Use script carefully, not recommended to use when mods are mostly active
+
+!! IMPORTANT !!
+Always turn on Deep search in settings, so script will switch rooms until he will found a wanted target
+
+Script shouldnt be published, but since i found another methods, let this script to see the internet
+
+
+
+// ==UserScript==
+// @name Player sniper
+// @namespace http://tampermonkey.net/
+// @version 2.11
+// @description Sniping players using username or UID
+// @author August10Loop 
+// @match https://drawaria.online/*
+// @icon https://www.google.com/s2/favicons?sz=64&domain=drawaria.online
+// @grant none
+// @run-at document-start
+// ==/UserScript==
+(function() {
+    'use strict';
+    let menuVisible = false;
+    let sniperBot = null;
+    let isSniping = false;
+    let startingRoom = null;
+    let currentRoomIndex = 0;
+    let targetNickname = '';
+    let targetUID = '';
+    const maxRooms = 10;
+    let snipeLogs = []; // Array to store snipe logs if you will reload if you will lose info)
+    let globalLogs = []; // Array to store global logs (if you will reload if you will lose info)
+    let deepSearch = false;
+    console.log('Sniper Script started at', new Date().toLocaleString());
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function switchToNextRoom() {
+        if (!sniperBot || !sniperBot.conn.socket || sniperBot.conn.socket.readyState !== WebSocket.OPEN) {
+            console.log('Sniper: Bot not active or WebSocket closed, stopping room switch at', new Date().toLocaleString());
+            return;
+        }
+        console.log('Sniper: Initiating room switch via bot WebSocket at', new Date().toLocaleString());
+        sniperBot.room.next();
+    }
+    const Player = function (name) {
+        this.name = name;
+        this.sid1 = null;
+        this.uid = '';
+        this.wt = '';
+        this.conn = new Connection(this);
+        this.room = new Room(this.conn);
+    };
+    const Connection = function (player) {
+        this.player = player;
+        this.socket = null;
+    };
+    Connection.prototype.onopen = function () {
+        console.log('Sniper: WebSocket opened for', this.player.name, 'at', new Date().toLocaleString());
+        this.Heartbeat(25000);
+    };
+    Connection.prototype.onclose = function () {
+        console.log('Sniper: WebSocket closed for', this.player.name, 'at', new Date().toLocaleString());
+        sniperBot = null;
+    };
+    Connection.prototype.onerror = function (event) {
+        console.error('Sniper: WebSocket error for', this.player.name, ':', event, 'at', new Date().toLocaleString());
+        updateSnipeResult('Connection error', '', 'Failed to connect to server.');
+        endSnipe(false);
+    };
+    Connection.prototype.onmessage = function (event) {
+        const message = String(event.data);
+        if (message.startsWith('42')) {
+            this.onbroadcast(message.slice(2));
+        } else if (message.startsWith('40')) {
+            this.onrequest();
+        } else if (message.startsWith('41')) {
+            console.log('Sniper: WebSocket 41 detected, stopping bot at', new Date().toLocaleString());
+            this.close();
+        } else if (message.startsWith('430')) {
+            const configs = JSON.parse(message.slice(3))[0];
+            this.player.room.players = configs.players;
+            this.player.room.id = configs.roomid;
+            console.log('Sniper: Bot joined room', this.player.room.id, 'Players:', this.player.room.players, 'at', new Date().toLocaleString());
+            checkPlayersInRoom();
+        }
+    };
+    Connection.prototype.onbroadcast = function (payload) {
+        const data = JSON.parse(payload);
+        if (data[0] === 'bc_uc_freedrawsession_changedroom') {
+            this.player.room.players = data[3];
+            this.player.room.id = data[4];
+            console.log('Sniper: Bot switched to new room', this.player.room.id, 'Players:', this.player.room.players, 'at', new Date().toLocaleString());
+            checkPlayersInRoom();
+        } else if (data[0] === 'mc_roomplayerschange') {
+            this.player.room.players = data[3];
+            console.log('Sniper: Players updated:', this.player.room.players);
+            checkPlayersInRoom();
+        }
+    };
+    Connection.prototype.onrequest = function () {};
+    Connection.prototype.open = function (url) {
+        this.socket = new WebSocket(url);
+        window.sockets.push(this.socket);
+        this.socket.onopen = this.onopen.bind(this);
+        this.socket.onclose = this.onclose.bind(this);
+        this.socket.onerror = this.onerror.bind(this);
+        this.socket.onmessage = this.onmessage.bind(this);
+    };
+    Connection.prototype.close = function () {
+        if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
+            this.socket.send('41');
+            this.socket.send('40');
+            this.socket.close();
+        }
+        sniperBot = null;
+    };
+    Connection.prototype.Heartbeat = function (interval) {
+        setTimeout(() => {
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send('2');
+                console.log('Sniper: Heartbeat sent for', this.player.name, 'at', new Date().toLocaleString());
+                this.Heartbeat(interval);
+            }
+        }, interval);
+    };
+    Connection.prototype.serverconnect = function (server, room) {
+        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+            this.open(server);
+        } else {
+            this.socket.send('41');
+            this.socket.send('40');
+        }
+        this.onrequest = () => {
+            this.socket.send(room);
+        };
+    };
+    const Room = function (conn) {
+        this.conn = conn;
+        this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+        this.players = [];
+    };
+    Room.prototype.join = function (invitelink) {
+        let gamemode = 2;
+        let server = '';
+        if (invitelink == null) {
+            this.id = null;
+            server = 'sv3.';
+        } else {
+            this.id = invitelink.startsWith('http') ? invitelink.split('/').pop() : invitelink;
+            if (invitelink.endsWith('.3')) {
+                server = 'sv3.';
+                gamemode = 2;
+            } else if (invitelink.endsWith('.2')) {
+                server = 'sv2.';
+                gamemode = 2;
+            } else {
+                server = '';
+                gamemode = 1;
+            }
+        }
+        const serverurl = `wss://${server}drawaria.online/socket.io/?sid1=undefined&hostname=drawaria.online&EIO=3&transport=websocket`;
+        const connectstring = `420["startplay","${this.conn.player.name}",${gamemode},"en",${nullify(this.id)},null,[null,"https://drawaria.online/",1000,1000,[${nullify(this.conn.player.sid1)},${nullify(this.conn.player.uid)},${nullify(this.conn.player.wt)}],null]]`;
+        this.conn.serverconnect(serverurl, connectstring);
+    };
+    Room.prototype.next = function () {
+        if (this.conn.socket.readyState !== WebSocket.OPEN) {
+            console.log('Sniper: WebSocket not open, cannot switch room at', new Date().toLocaleString());
+            return;
+        }
+        this.conn.socket.send('42["pgswtichroom"]');
+    };
+    const nullify = (value = null) => {
+        return value == null ? null : `"${value}"`;
+    };
+    // Override window.alert to handle disconnects
+    const originalAlert = window.alert;
+    window.alert = function(message) {
+        if (message && (message.includes("Vote kicked") || message.includes("Disconnected from server") || message.includes("Moderator: Reset avatar image") || message.includes("Room is full"))) {
+            console.log(`Sniper: Alert detected: ${message}, stopping bot at ${new Date().toLocaleString()}`);
+            if (sniperBot) {
+                sniperBot.conn.close();
+                sniperBot = null;
+                updateSnipeResult('Bot stopped', '', message);
+            }
+            return;
+        }
+        console.log(`Sniper: Non-suppressed alert: ${message} at ${new Date().toLocaleString()}`);
+        return originalAlert.apply(this, arguments);
+    };
+    function toggleSnipe() {
+        const snipeButton = document.querySelector('.snipe-button');
+        if (isSniping) {
+            console.log('Sniper: Stopping bot at', new Date().toLocaleString());
+            if (sniperBot) {
+                sniperBot.conn.close();
+            }
+            sniperBot = null;
+            isSniping = false;
+            snipeButton.textContent = 'Snipe!';
+            snipeButton.title = 'Start snipe';
+            return;
+        }
+        targetNickname = document.querySelector('#sniper-menu input[placeholder="Enter player name"]').value.trim();
+        targetUID = document.querySelector('#sniper-menu input[placeholder="Enter player UID (optional)"]').value.trim();
+        if (!targetNickname && !targetUID) {
+            originalAlert('Please enter a player name or UID.');
+            return;
+        }
+        isSniping = true;
+        currentRoomIndex = 0;
+        console.log('Sniper: Starting snipe for', targetNickname || '(no name)', 'UID:', targetUID || '(no UID)', 'at', new Date().toLocaleString());
+        const invurlInput = document.getElementById('invurl');
+        startingRoom = invurlInput ? invurlInput.value : null;
+        sniperBot = new Player('BigJim');
+        sniperBot.room.join(startingRoom);
+        snipeButton.textContent = 'Stop';
+        snipeButton.title = 'Stop snipe';
+    }
+    async function checkPlayersInRoom() {
+        if (!isSniping) return;
+        let players = sniperBot.room.players || [];
+        console.log('Sniper: Checking players in room', sniperBot.room.id, players);
+        const roomUrl = `https://drawaria.online/room/${sniperBot.room.id}`;
+        globalLogs.push({
+            roomUrl: roomUrl,
+            players: players.map(p => ({
+                name: p.name,
+                uid: p.avatarid ? p.avatarid.split('.')[0] : 'default'
+            })),
+            timestamp: new Date()
+        });
+        let targetPlayer = players.find(player =>
+            (targetNickname && player.name === targetNickname) ||
+            (targetUID && player.avatarid && player.avatarid.split('.')[0] === targetUID)
+        );
+        if (targetPlayer) {
+            snipeLogs.push({ nickname: targetPlayer.name, roomUrl: roomUrl, timestamp: new Date() });
+            updateSnipeResult('Player sniped!', roomUrl);
+            sniperBot.conn.close(); // Disconnect bot when player is found
+            endSnipe(true);
+        } else {
+            currentRoomIndex++;
+            if (deepSearch || currentRoomIndex < maxRooms) {
+                console.log('Sniper: Player not found, waiting 1 second before switching to next room at', new Date().toLocaleString());
+                await delay(1000);
+                switchToNextRoom();
+            } else {
+                updateSnipeResult('Player not sniped (Try search deep)', '', 'Player not in the game or room is full.');
+                sniperBot.conn.close(); // bot will be disconnected if player wont found
+                endSnipe(false);
+            }
+        }
+    }
+    function endSnipe(found) {
+        if (!isSniping) return;
+        isSniping = false;
+        const snipeButton = document.querySelector('.snipe-button');
+        snipeButton.textContent = 'Snipe!';
+        snipeButton.title = 'Start snipe';
+        sniperBot = null;
+    }
+    function CreateStylesheet() {
+        let container = document.createElement('style');
+        container.innerHTML = `
+            .sniper-button {
+                background: #ff6200;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                cursor: pointer;
+                transition: background 0.2s;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                position: relative;
+                z-index: 1001;
+                border-radius: 0;
+            }
+            .sniper-button:hover {
+                background: #ff8533;
+            }
+            .sniper-menu {
+                position: absolute;
+                background: #2c2c2c;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                width: 280px;
+                height: 200px;
+                z-index: 1000;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                display: none;
+                left: 40px;
+                top: 0;
+            }
+            .sniper-menu-header {
+                background: #ff6200;
+                color: #ffffff;
+                text-align: center;
+                padding: 8px;
+                font-weight: bold;
+                font-size: 15px;
+                border-bottom: 1px solid #6c757d;
+            }
+            .sniper-menu-content {
+                padding: 10px;
+                color: #ffffff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                height: calc(100% - 34px);
+            }
+            .sniper-menu-content .credit-text {
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+                font-size: 13px;
+                color: #ffffff;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+            .sniper-menu-content input {
+                width: 90%;
+                padding: 6px;
+                background: #444444;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                outline: none;
+                font-size: 13px;
+                margin-bottom: 8px;
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+            }
+            .sniper-menu-content input:focus {
+                border-color: #ff6200;
+            }
+            .sniper-menu-content .snipe-button {
+                width: 80%;
+                padding: 6px;
+                background: #ff6200;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                cursor: pointer;
+                font-size: 13px;
+                transition: background 0.2s;
+                margin-bottom: 8px;
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+            }
+            .sniper-menu-content .snipe-button:hover {
+                background: #ff8533;
+            }
+            .sniper-menu-content .logs-button, .global-logs-button {
+                width: 80%;
+                padding: 6px;
+                background: #ff6200;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                cursor: pointer;
+                font-size: 13px;
+                transition: background 0.2s;
+                margin-bottom: 8px;
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+            }
+            .sniper-menu-content .logs-button:hover, .global-logs-button:hover {
+                background: #ff8533;
+            }
+            .sniper-menu-content .snipe-result {
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+                font-size: 13px;
+                color: #ffffff;
+                margin-bottom: 8px;
+                text-align: center;
+                word-wrap: break-word;
+                max-width: 100%;
+            }
+            .sniper-menu-content .snipe-result a {
+                color: #ff6200;
+                text-decoration: none;
+            }
+            .sniper-menu-content .snipe-result a:hover {
+                text-decoration: underline;
+            }
+            .sniper-menu-content .snipe-subtext {
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+                font-size: 11px;
+                color: #ffffff;
+                text-align: center;
+            }
+            .sniper-logs, .global-logs {
+                position: absolute;
+                background: #2c2c2c;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                width: 320px;
+                height: 220px;
+                z-index: 1002;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                display: none;
+                right: 280px;
+                top: 0;
+                overflow-y: auto;
+                padding: 10px;
+            }
+            .sniper-logs-header, .global-logs-header {
+                background: #ff6200;
+                color: #ffffff;
+                text-align: center;
+                padding: 8px;
+                font-weight: bold;
+                font-size: 15px;
+                border-bottom: 1px solid #6c757d;
+            }
+            .sniper-logs-controls, .global-logs-controls {
+                display: flex;
+                justify-content: flex-start;
+                margin-bottom: 10px;
+            }
+            .sniper-logs-controls input, .global-logs-controls input {
+                flex-grow: 1;
+                padding: 6px;
+                background: #444444;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                outline: none;
+                font-size: 13px;
+                margin-right: 5px;
+            }
+            .sniper-logs-controls button, .global-logs-controls button {
+                padding: 6px 10px;
+                background: #ff6200;
+                color: #ffffff;
+                border: 1px solid #6c757d;
+                border-radius: 0;
+                cursor: pointer;
+                font-size: 13px;
+                width: auto;
+                margin-right: 5px;
+            }
+            .sniper-logs-controls button:last-child, .global-logs-controls button:last-child {
+                margin-right: 0;
+            }
+            .sniper-settings {
+                padding: 10px;
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+                font-size: 13px;
+            }
+            .sniper-settings label {
+                color: #ffffff;
+            }
+            .sniper-logs-content, .global-logs-content {
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                font-weight: 300;
+                font-size: 13px;
+            }
+            .sniper-logs-content div, .global-logs-content div {
+                margin-bottom: 6px;
+            }
+            .sniper-logs-content a, .global-logs-content a {
+                color: #ff6200;
+            }
+            .global-logs-content ul {
+                list-style-type: none;
+                padding-left: 10px;
+            }
+            .global-logs-content li {
+                margin-bottom: 4px;
+            }
+        `;
+        document.head.appendChild(container);
+    }
+    function updateSnipeResult(text, link = '', subtext = '') {
+        let content = document.querySelector('.sniper-menu-content');
+        let result = content.querySelector('.snipe-result');
+        if (!result) {
+            result = document.createElement('div');
+            result.className = 'snipe-result';
+            content.insertBefore(result, content.querySelector('.snipe-button'));
+        }
+        if (link) {
+            result.innerHTML = `${text} <a href="${link}" target="_blank">Link</a>`;
+        } else {
+            result.innerHTML = text;
+        }
+        let subtextEl = content.querySelector('.snipe-subtext');
+        if (subtext) {
+            if (!subtextEl) {
+                subtextEl = document.createElement('div');
+                subtextEl.className = 'snipe-subtext';
+                content.appendChild(subtextEl);
+            }
+            subtextEl.textContent = subtext;
+        } else if (subtextEl) {
+            subtextEl.remove();
+        }
+        setTimeout(() => {
+            result.innerHTML = '';
+            if (subtextEl) subtextEl.textContent = '';
+            const snipeButton = document.querySelector('.snipe-button');
+            snipeButton.textContent = 'Snipe!';
+            snipeButton.title = 'Start snipe';
+        }, 5000);
+    }
+    let logsVisible = false;
+    function toggleLogs() {
+        const logs = document.getElementById('sniper-logs');
+        logsVisible = !logsVisible;
+        logs.style.display = logsVisible ? 'block' : 'none';
+        if (logsVisible) {
+            renderLogs();
+        }
+    }
+    // Function to render snipe logs
+    function renderLogs(searchQuery = '') {
+        const logsContent = document.querySelector('.sniper-logs-content');
+        logsContent.innerHTML = '';
+        const filteredLogs = searchQuery
+            ? snipeLogs.filter(log => log.nickname.toLowerCase().includes(searchQuery.toLowerCase()))
+            : snipeLogs;
+        filteredLogs.forEach(log => {
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `${log.nickname} - <a href="${log.roomUrl}" target="_blank">${log.roomUrl}</a> (${log.timestamp.toLocaleString()})`;
+            logsContent.appendChild(logEntry);
+        });
+    }
+    let globalLogsVisible = false;
+    function toggleGlobalLogs() {
+        const globalLogsDiv = document.getElementById('global-logs');
+        globalLogsVisible = !globalLogsVisible;
+        globalLogsDiv.style.display = globalLogsVisible ? 'block' : 'none';
+        if (globalLogsVisible) {
+            renderGlobalLogs();
+        }
+    }
+    function renderGlobalLogs(searchQuery = '') {
+        const logsContent = document.querySelector('.global-logs-content');
+        logsContent.innerHTML = '';
+        const filteredLogs = searchQuery
+            ? globalLogs.filter(log => log.players.some(player =>
+                player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                player.uid.toLowerCase().includes(searchQuery.toLowerCase())
+              ))
+            : globalLogs;
+        filteredLogs.forEach(log => {
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `Room: <a href="${log.roomUrl}" target="_blank">${log.roomUrl}</a> (${log.timestamp.toLocaleString()})`;
+            const playerList = document.createElement('ul');
+            log.players.forEach(player => {
+                const playerItem = document.createElement('li');
+                playerItem.textContent = `${player.name} (UID: ${player.uid})`;
+                playerList.appendChild(playerItem);
+            });
+            logEntry.appendChild(playerList);
+            logsContent.appendChild(logEntry);
+        });
+    }
+    function addSniperButton() {
+        const existingMenuButton = document.getElementById('roomcontrols-menu');
+        if (existingMenuButton) {
+            const sniperButton = document.createElement('button');
+            sniperButton.className = 'btn btn-outline-secondary btn-sm sniper-button';
+            sniperButton.textContent = 'S';
+            sniperButton.title = 'Click to toggle Player Sniper menu';
+            sniperButton.onclick = () => toggleSniperMenu();
+            const sniperMenu = document.createElement('div');
+            sniperMenu.className = 'sniper-menu';
+            sniperMenu.id = 'sniper-menu';
+            sniperMenu.innerHTML = `
+                <div class="sniper-menu-header">Player Sniper</div>
+                <div class="sniper-menu-content">
+                    <div class="credit-text">August10Loop was here.</div>
+                    <input type="text" placeholder="Enter player name">
+                    <input type="text" placeholder="Enter player UID (optional)">
+                    <button class="snipe-button">Snipe!</button>
+                    <button class="logs-button">Logs</button>
+                    <button class="global-logs-button">Global Logs</button>
+                </div>
+            `;
+            const sniperLogs = document.createElement('div');
+            sniperLogs.className = 'sniper-logs';
+            sniperLogs.id = 'sniper-logs';
+            sniperLogs.innerHTML = `
+                <div class="sniper-logs-header">Snipe Logs</div>
+                <div class="sniper-logs-controls">
+                    <input type="text" placeholder="Search by username">
+                    <button class="reload-button">Reload</button>
+                    <button class="settings-button">Settings</button>
+                </div>
+                <div class="sniper-settings" style="display: none;">
+                    <label>
+                        <input type="checkbox" id="deep-search">
+                        Search-Deep
+                    </label>
+                </div>
+                <div class="sniper-logs-content"></div>
+            `;
+            const globalLogsDiv = document.createElement('div');
+            globalLogsDiv.className = 'global-logs';
+            globalLogsDiv.id = 'global-logs';
+            globalLogsDiv.innerHTML = `
+                <div class="global-logs-header">Global Player Logs</div>
+                <div class="global-logs-controls">
+                    <input type="text" placeholder="Search by username or UID">
+                    <button class="reload-button">Reload</button>
+                </div>
+                <div class="global-logs-content"></div>
+            `;
+            existingMenuButton.parentNode.insertBefore(sniperButton, existingMenuButton.nextSibling);
+            existingMenuButton.parentNode.insertBefore(sniperMenu, sniperButton.nextSibling);
+            existingMenuButton.parentNode.insertBefore(sniperLogs, sniperButton);
+            existingMenuButton.parentNode.insertBefore(globalLogsDiv, sniperButton);
+            document.querySelector('.snipe-button').addEventListener('click', toggleSnipe);
+            document.querySelector('.logs-button').addEventListener('click', toggleLogs);
+            document.querySelector('.global-logs-button').addEventListener('click', toggleGlobalLogs);
+            const searchInput = document.querySelector('.sniper-logs-controls input');
+            const reloadButton = document.querySelector('.sniper-logs-controls .reload-button');
+            const settingsButton = document.querySelector('.settings-button');
+            const settingsDiv = document.querySelector('.sniper-settings');
+            const deepSearchCheckbox = document.getElementById('deep-search');
+            reloadButton.addEventListener('click', () => renderLogs(searchInput.value));
+            searchInput.addEventListener('input', () => renderLogs(searchInput.value));
+            settingsButton.addEventListener('click', () => {
+                settingsDiv.style.display = settingsDiv.style.display === 'none' ? 'block' : 'none';
+            });
+            deepSearchCheckbox.addEventListener('change', () => {
+                deepSearch = deepSearchCheckbox.checked;
+            });
+            const globalSearchInput = document.querySelector('.global-logs-controls input');
+            const globalReloadButton = document.querySelector('.global-logs-controls .reload-button');
+            globalReloadButton.addEventListener('click', () => renderGlobalLogs(globalSearchInput.value));
+            globalSearchInput.addEventListener('input', () => renderGlobalLogs(globalSearchInput.value));
+        }
+    }
+    function toggleSniperMenu() {
+        const menu = document.getElementById('sniper-menu');
+        if (menu) {
+            menuVisible = !menuVisible;
+            menu.style.display = menuVisible ? 'block' : 'none';
+        }
+    }
+    console.log('Loaded');
+    const BLACKLIST = {
+        symbols: ['𒐫', '꧅'],
+        texts: [
+            'Это против наших правил: изображения 18+, боты, ругательства и грубые выражения',
+            'Здесь можно ознакомиться с нашими Правилами...',
+            'Кто-то пожаловался на , тема жалобы: " "',
+            'Кто-то пожаловался',
+            'Текущий игрок не активен',
+            'The following are not allowed: explicit depictions, rude expressions and swearings',
+            'Here you can read our Rules...',
+            'drawer is inactive',
+            'Someone is reported , reason: " "',
+            'Someone is reported'
+        ]
+    };
+    function startPlayerObserver() {
+        console.log('Starting MutationObserver for player nicknames filtering at', new Date().toLocaleString());
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1 && node.classList?.contains('player')) {
+                            const nameContent = node.textContent.trim().toLowerCase();
+                            console.log('Detected player:', node.textContent);
+                            if (BLACKLIST.symbols.some(symbol => nameContent.includes(symbol)) ||
+                                BLACKLIST.texts.some(text => nameContent.includes(text.trim().toLowerCase()))) {
+                                console.log('Removed player:', node.textContent);
+                                node.remove();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+    window.addEventListener('load', function() {
+        console.log('0', new Date().toLocaleString());
+        startPlayerObserver();
+    });
+    setTimeout(() => {
+        console.log('Launched antispam', new Date().toLocaleString());
+        startPlayerObserver();
+    }, 5000);
+    function init() {
+        window.sockets = [];
+        CreateStylesheet();
+        addSniperButton();
+    }
+    init();
+})();
