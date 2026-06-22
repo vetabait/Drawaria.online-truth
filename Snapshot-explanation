@@ -1,0 +1,9 @@
+
+Snapshot - this is a moderator's function, which can save data about room, exactly:
+- Chat (System messages, player messages)
+- Player list
+Snapshots are being saved for foverer (In my mind), so moderators can see your past messages.
+
+I'm feeling better to describe information about snapshots with an image, so i left a ibb.co png which shows snapshot logic
+
+-----> https://i.ibb.co/WWzBFXSD/image.png <-----
