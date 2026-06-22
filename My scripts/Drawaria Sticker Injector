@@ -1,0 +1,333 @@
+This script can send images and videos in the chat
+Players will see your image if they will have the script installed too
+I left instructions in chat when script will be launched
+
+Also scripts works only for tampermonkey, not for console.
+
+
+// ==UserScript==
+// @name         Drawaria Sticker Injector
+// @namespace    http://tampermonkey.net/
+// @version      2.9
+// @description  Inject custom stickers and videos into chat (visible only who has the script installed)
+// @author       Vetanskiy (August10Loop)
+// @include      https://drawaria.online*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=drawaria.online
+// @grant        GM_xmlhttpRequest
+// @license      MIT
+// ==/UserScript==
+ 
+(() => {
+    'use strict';
+ 
+    const MAX_VIDEO_DURATION = 300;
+    let loadingDiv = null;
+ 
+    function showLoading() {
+        if (loadingDiv) return;
+        loadingDiv = document.createElement('div');
+        loadingDiv.id = 'upload-loading';
+        loadingDiv.textContent = 'Uploading...';
+        loadingDiv.style.padding = '10px';
+        loadingDiv.style.textAlign = 'center';
+        loadingDiv.style.fontStyle = 'italic';
+        loadingDiv.style.color = '#666';
+        const chatMessages = document.getElementById('chatbox_messages');
+        if (chatMessages) {
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+ 
+    function hideLoading() {
+        if (loadingDiv) {
+            loadingDiv.remove();
+            loadingDiv = null;
+        }
+    }
+ 
+    function uploadToTfLink(file) {
+        return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('file', file);
+ 
+            GM_xmlhttpRequest({
+                method: 'POST',
+                url: 'https://tmpfile.link/api/upload',
+                data: formData,
+                onload: function(response) {
+                    if (response.status >= 200 && response.status < 300) {
+                        try {
+                            const json = JSON.parse(response.responseText);
+                            if (json.downloadLink && json.downloadLink.startsWith('https://d.tmpfile.link/')) {
+                                resolve(json.downloadLink);
+                            } else {
+                                reject(new Error('Invalid response from tfLink'));
+                            }
+                        } catch (e) {
+                            reject(new Error('Failed to parse tfLink response'));
+                        }
+                    } else {
+                        reject(new Error(`Upload failed: ${response.status} ${response.statusText}`));
+                    }
+                },
+                onerror: function(error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+ 
+    function sendChatMessage(msg) {
+        const input = document.getElementById('chatbox_textinput');
+        if (!input) return;
+        const oldValue = input.value;
+        input.value = msg;
+        const event = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true });
+        input.dispatchEvent(event);
+        input.value = oldValue;
+    }
+ 
+    function addMediaButtons() {
+        if (document.getElementById('sticker-image-btn') || document.getElementById('sticker-video-btn')) {
+            return; 
+        }
+ 
+        const inputField = document.getElementById('chatbox_textinput');
+        if (!inputField) return;
+ 
+        const imageFileInput = document.createElement('input');
+        imageFileInput.type = 'file';
+        imageFileInput.accept = 'image/*,.webp';
+        imageFileInput.style.display = 'none';
+        document.body.appendChild(imageFileInput);
+        imageFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showLoading();
+            try {
+                const url = await uploadToTfLink(file);
+                if (url) sendChatMessage(url);
+                else alert('Upload failed – check console.');
+            } catch (err) {
+                console.error('tfLink upload error:', err);
+                alert('Failed to upload, disable vpn if not works');
+            } finally {
+                hideLoading();
+            }
+            imageFileInput.value = '';
+        });
+ 
+        const videoFileInput = document.createElement('input');
+        videoFileInput.type = 'file';
+        videoFileInput.accept = 'video/*';
+        videoFileInput.style.display = 'none';
+        document.body.appendChild(videoFileInput);
+        videoFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+ 
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(file);
+            video.onloadedmetadata = async () => {
+                URL.revokeObjectURL(video.src);
+                if (video.duration > MAX_VIDEO_DURATION) {
+                    alert('Video too long (max 5 min).');
+                    return;
+                }
+                showLoading();
+                try {
+                    const url = await uploadToTfLink(file);
+                    if (url) sendChatMessage(url);
+                    else alert('Upload failed – check console.');
+                } catch (err) {
+                    console.error('tfLink upload error:', err);
+                    alert('Failed to upload. Check vpn or diasble it');
+                } finally {
+                    hideLoading();
+                }
+                videoFileInput.value = '';
+            };
+            video.onerror = () => {
+                URL.revokeObjectURL(video.src);
+                alert('Cannot read video file.');
+            };
+        });
+ 
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'input-group-append';
+        btnGroup.style.display = 'flex';
+ 
+        const imageBtn = document.createElement('button');
+        imageBtn.id = 'sticker-image-btn';
+        imageBtn.className = 'btn btn-outline-secondary';
+        imageBtn.innerHTML = '<i class="bx bx-image" style="font-size: 22px;"></i>';
+        imageBtn.title = "Send Image Sticker (.png, .jpg, .gif, .webp)";
+        imageBtn.style.width = '44px';
+        imageBtn.style.height = '38px';
+        imageBtn.style.marginRight = '2px';
+        imageBtn.addEventListener('click', (e) => { e.preventDefault(); imageFileInput.click(); });
+ 
+        const videoBtn = document.createElement('button');
+        videoBtn.id = 'sticker-video-btn';
+        videoBtn.className = 'btn btn-outline-secondary';
+        videoBtn.innerHTML = '<i class="bx bx-video" style="font-size: 22px;"></i>';
+        videoBtn.title = "Send Video (max 5 min)";
+        videoBtn.style.width = '44px';
+        videoBtn.style.height = '38px';
+        videoBtn.addEventListener('click', (e) => { e.preventDefault(); videoFileInput.click(); });
+ 
+        btnGroup.appendChild(imageBtn);
+        btnGroup.appendChild(videoBtn);
+        inputField.after(btnGroup);
+    }
+ 
+    function processChatMessage(node) {
+        const textSpan = node.querySelector('.playerchatmessage-text');
+        if (!textSpan) return;
+ 
+        let url = textSpan.textContent.trim();
+        const link = textSpan.querySelector('a');
+        if (link) url = link.href;
+ 
+        const lower = url.toLowerCase();
+ 
+        if (lower.startsWith('https://d.tmpfile.link/') &&
+            (lower.endsWith('.png') || lower.endsWith('.jpg') ||
+             lower.endsWith('.jpeg') || lower.endsWith('.gif') ||
+             lower.endsWith('.webp') ||
+             lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg'))) {
+ 
+            if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') ||
+                lower.endsWith('.gif') || lower.endsWith('.webp')) {
+ 
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Sticker';
+                img.style.maxWidth = '140px';
+                img.style.height = 'auto';
+                img.style.borderRadius = '8px';
+                img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                textSpan.innerHTML = '';
+                textSpan.appendChild(img);
+ 
+            } else if (lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg')) {
+ 
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = true;
+                video.style.maxWidth = '140px';
+                video.style.height = 'auto';
+                video.style.borderRadius = '8px';
+                video.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                textSpan.innerHTML = '';
+                textSpan.appendChild(video);
+            }
+        }
+    }
+ 
+    function setupChatObserver() {
+        const chat = document.getElementById('chatbox_messages');
+        if (!chat) return;
+ 
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                setTimeout(() => {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.classList?.contains('chatmessage')) {
+                            processChatMessage(node);
+                        }
+                    });
+                }, 100);
+            });
+        });
+        observer.observe(chat, { childList: true, subtree: true });
+ 
+        chat.querySelectorAll('.chatmessage').forEach(processChatMessage);
+    }
+ 
+    function addTips() {
+        const chat = document.getElementById('chatbox_messages');
+        if (!chat || document.getElementById('tips-container')) return;
+ 
+        const container = document.createElement('div');
+        container.id = 'tips-container';
+        container.style.padding = '10px';
+        container.style.fontStyle = 'italic';
+        container.style.color = '#888';
+        container.style.lineHeight = '1.5';
+ 
+        container.innerHTML = `
+            <div style="color: #ff4444; font-weight: bold;">Read this text if you want to be safe!</div>
+            <div>DONT UPLOAD NSFW / ILLEGAL CONTENT</div>
+            <div>Script was not approved by moderation so you will be banned if you will use this script so be carefully</div>
+            <div>Script is not working in console (F12), only tampermonkey.</div>
+            <div>Players wont see your image if they dont have this script installed</div>
+            <div>Also short name of your video/image before uploading it or it will be shown as text<br>
+                 (Example: Testblablablablalbalfdsakrfdjacoolpng.jpeg (UNCORRECT) → coolimage.jpg (CORRECT))</div>
+            <div>Script was made by Vetanskiy, enjoy <3</div>
+ 
+            <button id="toggle-russian" style="margin-top: 8px; padding: 5px 12px; font-size: 13px; background: transparent; color: #888; border: 1px solid #888; border-radius: 4px; cursor: pointer;">
+                Русский перевод ▼
+            </button>
+ 
+            <div id="russian-tips" style="display: none; margin-top: 8px;">
+                <div style="color: #ff4444; font-weight: bold;">Пожалуйста, прочти этот текст если хочешь быть в безопасности</div>
+                <div>НЕ ЗАГРУЖАЙТЕ NSFW / НЕЛЕГАЛЬНЫЙ КОНТЕНТ</div>
+                <div>Скрипт был не одобрен модерацией, так что вы будете забанены если используете этот скрипт, будьте аккуратны</div>
+                <div>Скрипт не работает в консоли (F12), только tampermonkey.</div>
+                <div>Игроки не увидят твою картинку если у них не установлен этот скрипт</div>
+                <div>Также сокращайте имя файла перед загрузкой, иначе медиа будет отображаться как текст<br>
+                     (Пример: Тестблаблаблааовыофаолалывфаыфв.png (Слишком длинно) → круто.jpg (Отлично!))</div>
+                <div>Скрипт был сделан Vetanskiy, приятного использования <3</div>
+            </div>
+        `;
+ 
+        chat.appendChild(container);
+        chat.scrollTop = chat.scrollHeight;
+ 
+        const toggleBtn = document.getElementById('toggle-russian');
+        const russianDiv = document.getElementById('russian-tips');
+ 
+        toggleBtn.addEventListener('click', () => {
+            if (russianDiv.style.display === 'none') {
+                russianDiv.style.display = 'block';
+                toggleBtn.innerHTML = 'Русский перевод ▲';
+            } else {
+                russianDiv.style.display = 'none';
+                toggleBtn.innerHTML = 'Русский перевод ▼';
+            }
+        });
+    }
+ 
+    function addBoxIcons() {
+        if (document.getElementById('boxicons-link')) return;
+        const link = document.createElement('link');
+        link.id = 'boxicons-link';
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css';
+        document.head.appendChild(link);
+    }
+ 
+    const initObserver = new MutationObserver(() => {
+        if (document.getElementById('chatbox_textinput') && document.getElementById('chatbox_messages')) {
+            addBoxIcons();
+            addMediaButtons();
+            setupChatObserver();
+            setTimeout(addTips, 13000);
+            initObserver.disconnect();
+        }
+    });
+    initObserver.observe(document.body, { childList: true, subtree: true });
+ 
+    if (document.readyState === 'complete') {
+        setTimeout(() => {
+            if (document.getElementById('chatbox_textinput') && document.getElementById('chatbox_messages')) {
+                addBoxIcons();
+                addMediaButtons();
+                setupChatObserver();
+                setTimeout(addTips, 13000);
+            }
+        }, 1500);
+    }
+})();
