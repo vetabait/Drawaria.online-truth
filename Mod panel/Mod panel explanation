@@ -1,0 +1,60 @@
+
+The moderator's journey starts from a simple site - drawaria.online/getserverstate
+
+          drawaria.online/getserverstate
+
+
+Site loads a quick rooms list, where moderators can see:
+
+- Rooms
+- Rooms canvas
+- Rooms description
+- Players in rooms
+- Players hash
+- Players country
+
+Also in getserverstate they can do the same as moderators in other platform
+
+
+- Message to player from moderator (The message will be seen for him only)
+- Ban
+- Kick
+
+This site was made just to see rooms quickly.
+
+------------------------------------------------- MOD MENU ------------------------------------------------
+
+Basically lets explain how moderators can do a lot of stuff with players, when in getserverstate they can do only three actions
+
+https://drawaria.online/modpanel?server=3&room=(Room id)&player=(id of player)&openmenu=(1 or 0)
+
+The menu can be opened by changing url data or Ctrl + Shift + click on a player
+
+by changing openmenu= to 0 youre just seeing the room, without moderator tools (Like a snapshot)
+by changing openmenu= to 1 youre you can see room and moderator tools
+
+In moderators tools by RCON they can:
+
+1. /rcon/kickplayer/{roomId}/{playerId}/{reason}  // kick
+2. /rcon/banplayer/{ip}/{type}/{reason}/{time}/{accountId}/{snapshotId}/{roomId}/{playerId} // ban
+3. /rcon/resetname/{roomId}/{playerId} // reset name of player
+4. /rcon/resetavatar/{roomId}/{playerId} // reset avatar
+5. /rcon/clearcanvas/{roomId} // clear canvas
+6. /rcon/rollbackcanvas/{roomId} // rollback canvas
+7. /rcon/clearplaylist/{roomId} // clearplaylist (useless)
+8. /rcon/resetname/{roomId} // reset description room
+9. /rcon/startmatch/{roomId} // start match
+10. /rcon/msg/{message}/{roomId}/{playerId} // message to player from Moderator: face (Write id if you want send this to player, or dont write the player id, in result you will send a moderator message to everyone in room)
+11. /rcon/msg/rules:2/{roomId}/{playerId} // send rules in room to player or to whole room
+12. /rcon/snapshot/{roomId}?retjson=1 // save room data (or else snapshot creation)
+13. /rcon/snapshot/{roomId}/{playerId}/ban/ // create snapshot for a ban
+14. /rcon/snapshotlist/{roomId} // see snapshots by room uuid
+15. /rcon/getfpid/{roomId}/{playerId} // fingerprint of player in room (dont know what is this)
+
+Fpid here mentions as this
+- Detect Visitor ID
+(For users who dont know what is id - When you are joining in room, the server gives you id - it can be from 1 to infinity. The system of ID: The counter inside the system simply increases by one every time someone joining the roomn, and never decreases)
+
+
+Also rcon commands can be used in chat where average players are talking.
+Examples you can see in up
