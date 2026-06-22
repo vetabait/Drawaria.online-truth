@@ -1,0 +1,179 @@
+
+Often people are using public scripts, and most of these scripts have sockets to bypass the cooldown and more.
+Some of sockets that i found are not mentioned in some scripts, so they are going to be leaked in down, have fun :>
+
+(Ive removed dangerous sockets that can hurt the game, maybe when the time will come, i will reveal them too)
+
+// Errors
+42["connect"]                                   // Connection error
+42["disconnect"]                                // Disconnect from the server
+42["connect_error"]
+42["connect_timeout"]                           // Timeout (20000)
+42["error"]                                     // Socket error
+
+// msgs
+42["chatmsg","text"]                            // Send msg
+42["bc_chatmessage",1,"Name of player","text"]  // Get msg from players
+42["uc_chatmuted"]                              // Muted for spam
+42["bc_announcement","text"]                    // Dont know
+42["bc_extannouncement","text"]                 // Dont know
+- // Snapshot (cutted)
+
+// 3. player functions
+42["mc_roomplayerschange","join",[...],...]     // Player connect/disconnect
+42["bc_resetplayername",1,"Name of player"]     // Reset player name
+42["bc_setstatusflag",1,0,true]                 // set Flag
+42["bc_playerafk",1,"Name of player"]           // AFK flag
+42["bc_spawnavatar",1,true]                     // Spawn avatar (t/f)
+42["mc_moveavatar",1,36081456,true]             // Avatar movement
+42["bc_setavatarprop",1]                        // Avatar prop (Circle, square)
+42["uc_resetavatar"]                            // Reset avatar by moderation
+
+// 4. draw stuff
+42["drawcmd",0,[x,y,x2,y2,true,-size,"color",id]] // Draw cmd
+42["mc_drawcommand",0,[...]]                    // draw cmd from players
+42["bc_freedrawsession_start",...]              // draw session
+42["bc_freedrawsession_reset",-1,{...},null]    // clean/rollback canvas
+42["bc_freedrawsession_changedroom",...]        // room change
+42["bc_clearcanvasobj"]                         // Didnt test, but this socket is related to stencils
+42["bc_createcanvasobj","1",[...]]              // Didnt test, but this socket is related to stencils
+42["bc_removecanvasobj",3,"1",null]             // Didnt test, but this socket is related to stencils
+42["mc_moveobj","1",x,y,3,{movespeed:500}]      // Didnt test, but this socket is related to stencils
+42["mc_rotateobj","1",0.2617993877991494,3]     // Didnt test, but this socket is related to stencils
+42["bc_setobjattr","1","shared",false]          // Didnt test, but this socket is related to stencils
+42["uc_canvasobjs","9a2ab5b2...",{}]            // Didnt test, but this socket is related to stencils
+
+// 5. votes
+42["sendvote"]                                  // send vote (kick and more)
+42["sendvotekick",12345]                        // same vote send
+42["bc_votekick","Name of player",22,true]      // kick from player
+42["bcmc_playervote","Name of player",{...}]    // Someone voted...
+42["bc_votingtimeout",{...}]                    // Timeout
+42["bc_customvoting_start",{...},1]             // Rollback i guess
+42["bc_customvoting_vote",1,0,[...]]            // your vote of rollback
+42["bc_customvoting_results",[2],true,0]        // results of vote
+42["bc_customvoting_abort"]                     // cancel the abort
+42["bc_customvoting_error","rollbackcanvas"]    // error of rollback
+
+// 6. game functional
+42["passturn"]                                  // Skip ur turn
+42["playerrated"]                               // rate player's drawing
+42["bc_playerrated",1,29,"Name of player1",28,"Name of player2",[1]] // rate drawing
+42["bc_turn_waitplayers",true,-1,6]             // wait players
+42["bc_startinground",200000,[],{...}]          // start for round
+42["mc_turn_waitselectword",11000,"Name of player",...] // wait for choice
+42["uc_turn_selectword",11000,["word1","word2"],1,7,false] // choose word2
+42["uc_turn_selectword_refreshlist",[...]]      // update of words list
+42["uc_turn_begindraw",90000,"word"]            // begin draw
+42["mc_turn_guessdraw",90000,[],"word",{...}]   // guess draw
+42["mc_turn_tip","text"]                        // tip of the word
+42["mc_turn_wordguessed","Name of player",[[...]]] // someone guessed  the word
+42["uc_turn_wordguessedself","word",3,[[...]]]  // you guessed
+42["bc_turn_fastout",15000]                     // no idea
+42["bc_turn_abort","pass","Name of player","id","word"] // abort
+42["bc_turn_results",[[...]],"word"]            // results
+42["bc_round_results",[[...]]]                  // round results
+42["wordselected",0]                            // word selected
+
+// 7. inventory
+42["uc_inventoryitems",[[100,99,null],...],false,false] // inventory
+42["bcuc_itemactivated",3,63001,[...],1]        // item was activated
+42["bcuc_itemactivationabort",...]              // error
+42["uc_buyitemerror"]                           // error of item purchase 
+
+// 8. tokens and exp
+42["bc_token",1,3,0]                            // get token
+42["uc_tokenerror",2]                           // error of token
+42["bc_exp",29,4357]                            // xp info
+42["uc_coins",-50,43]                           // coins info
+
+// 9. soundcloud songs
+42["clientcmd",1,[trackId]]                     // vote for track
+42["bc_musicbox_vote",[[30394,1]],3,30394]      // vote for track
+42["bc_musicbox_play",[30394,1,"37678185"...]]  // play track
+42["clientcmd",321,[]]                          // vote for the next track
+
+// 10. avatars and gestures
+42["clientcmd",101,[]]                          // spawn avatar
+42["clientcmd",102,[]]                          // get avatars state
+42["clientcmd",103,[pos,false]]                 // move avatar
+42["clientcmd",115,[]]                          // toggle avatar shape
+42["bc_spawnavatar",3,true]                     // avatar spawned (notification)
+42["mc_moveavatar",3,pos,true]                  // avatar moved (notification)
+42["bc_setavatarprop",3]                        // avatar shape changed (notification)
+42["uc_avatarspawninfo",uuid,[[id,pos,shape]]]  // full avatars info
+42["sendgesture",16]                            // send gesture
+42["bc_gesture",3,31]                           // gesture received
+
+// 11. stencils
+42["clientcmd",230,[0,posX,posY,{movespeed}]]   // set stencil position
+42["clientcmd",231,[0,rotation]]                // set stencil rotation
+42["clientcmd",232,[0]]                         // remove stencil
+42["clientcmd",233,[]]                          // get all stencils
+42["clientcmd",234,[0,"shared",true]]           // change stencil attr
+42["bc_createcanvasobj","1",[data]]             // stencil created
+42["bc_clearcanvasobj"]                         // all stencils cleared
+42["bc_removecanvasobj",3,"1",null]             // stencil removed
+42["mc_moveobj","1",x,y,3,{movespeed}]          // stencil moved
+42["mc_rotateobj","1",radians,3]                // stencil rotated
+42["bc_setobjattr","1","shared",false]          // stencil attr changed
+42["uc_canvasobjs",uuid,{}]                     // all stencils list
+
+// 12. ask to draw stuff
+42["pgdrawvote",2,0]                            // vote allow/forbid draw
+42["bc_pgdrawallow_startvoting",2,1,false]      // voting started
+42["bc_pgdrawallow_results",2,true,true]        // voting results
+42["bc_pgdrawallow_vote",2,1,0,false,[1,0]]     // vote cast
+
+// 13. snapshot stuff
+-   // create snapshot
+42["uc_snapshot","timestamp.id"]                // snapshot created
+
+
+
+
+42["clientnotify",-1,1,[1,"Name of player"]]    // mute/unmute
+42["clientnotify",-1,2,["Name of player","4"]]  // report
+42["clientnotify",-1,3,[1,"Name of player"]]    // hide/show drawing
+42["clientnotify",-1,11,[id of drawing]]                // gallery upload
+
+
+// 14. mod actions
+42["clientnotify",-1,100,[2]]                   // show rules
+-                  // request canvas
+-             // respond with canvas
+42["bc_clientnotify",id,"Name",2,null]          // notification received
+42["bcuc_moderatormsg","text",true]             // moderator message
+42["bc_resetplayername",1,"Name of player"]     // reset name
+42["uc_resetavatar"]                            // reset avatar
+42["clientcmd",901,[fingerprint]]               // send fingerprint (really dont know what is this, but i think its related to anti-alt system)
+42["bcuc_getfpid"]                              // request fingerprint (really dont know what is this, but i think its related to anti-alt system)
+
+// 15. playground staff
+42["pgswtichroom"]                              // switch room
+42["clientcmd",320,[]]                          // start rollback voting
+42["clientcmd",321,[]]                          // start next track voting
+42["bc_uc_freedrawsession_start",...]           // session started
+42["bc_uc_freedrawsession_changedroom",...]     // room changed
+42["bc_freedrawsession_reset",-1,{...},null]    // session reset
+
+// 16. Another stuff
+42["playerafk"]                                 // afk signal
+42["startplay",...]                             // join room
+42["clientcmd",10,[true]]                       // get inventory
+42["clientcmd",11,[100]]                        // buy item
+42["clientcmd",12,[100,[]]]                     // activate item
+42["clientcmd",3,[flagId,true]]                 // set status flag
+42["clientcmd",2,[playerId,tokenIndex]]         // give token
+42["clientcmd",301,[0]]                         // vote option
+-             // create snapshot
+42["clientcmd",901,[fingerprint]]               // send fingerprint
+42["clientcmd",101,[]]                          // spawn avatar
+42["clientcmd",103,[pos,false]]                 // move avatar
+42["clientcmd",115,[]]                          // avatar shape
+42["clientcmd",230,[0,posX,posY,{movespeed}]]   // stencil position
+42["clientcmd",231,[0,rotation]]                // stencil rotation
+42["clientcmd",232,[0]]                         // remove stencil
+42["clientcmd",233,[]]                          // get stencils
+42["clientcmd",234,[0,"shared",true]]           // stencil attr
+42["clientcmd",102,[]]                          // avatars state
