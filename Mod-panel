@@ -62,7 +62,7 @@ $.getJSON(o + "/modpanel/getserverstate", {         <-------     If youre thinki
 ----------------------- SNAPHOTS -----------------------
 
 
-Most of people are wondering: How moderators can track people if theyre not in room? Are they joining without accounts&
+Most of people are wondering: How moderators can track people if theyre not in room? Are they joining without accounts?
 Answer: Snapshots
 
 Snapshots - this is a function, when all data about room (System chat messages and messages of players, room list and more) saves for moderators, so they can see information about room without any problems.
