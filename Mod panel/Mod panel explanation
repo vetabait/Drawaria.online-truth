@@ -51,6 +51,11 @@ In moderators tools by RCON they can:
 14. /rcon/snapshotlist/{roomId} // see snapshots by room uuid
 15. /rcon/getfpid/{roomId}/{playerId} // fingerprint of player in room (dont know what is this)
 
+
+Also ive left an easy ui of how it looks, nobody can extract the same ui as in original game files, so these are just simple buttons.
+
+-----> https://i.ibb.co/vvXqpB1B/image.png <-----
+
 Fpid here mentions as this
 - Detect Visitor ID
 (For users who dont know what is id - When you are joining in room, the server gives you id - it can be from 1 to infinity. The system of ID: The counter inside the system simply increases by one every time someone joining the roomn, and never decreases)
