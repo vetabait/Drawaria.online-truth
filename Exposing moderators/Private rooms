@@ -1,0 +1,33 @@
+
+Here i will talk about private rooms, how moderators are hiding it and how they are seeing your private room
+
+Well, moderators are saying to every human if someone will ask "can moderators see private rooms?"
+
+- No.
+
+But, then why do you have THIS in your code?
+
+     https://drawaria.online/pageres/modpanel.js        // you can check the code by yourself in any ai or just by your own eye
+
+
+
+ opt_privateroom = g[3] // exporting private rooms
+ e += '\n\t\t\t\t\t<div class="roomitem ' + (opt_privateroom ? "privateroom" : "") + '" data-roomid="' + roomid + '">\n' // showing room as private
+
+
+But there is plus from their modpanel
+
+ $("#rooms .privateroom .btn").addClass("disabled") // if private - tools disabled
+ e += '<img src="' + o + "/roompreviews/" + roomid + '.jpg" style="' + (roomtype != ROOMTYPE_PLAYGROUND || opt_privateroom ? "display: none" : "") + '">\n' // cant get canvas of room if private
+ opt_privateroom && (roomid = roomid.substring(0,24) + "000000000000") // for moderators your url of private room looks like this: https://drawaria.online/room/6c573c30-69b0000000000000000000000000
+
+
+So, the question comes
+
+Why i made this file if moderators cant see anything?
+
+There is an expection:
+If they have blocked ui, it doesnt mean that they cant have full access to it
+They can change values from disabled to enabled, true - false, and use rcon commands, because there is nothing written about rcon and private room
+So this is just small ui protection, but if somebody wants, they can change values - and kaboom
+
