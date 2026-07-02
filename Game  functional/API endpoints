@@ -1,0 +1,54 @@
+
+Here i will talk about endpoints of drawaria.online, and what they have inside.
+
+// GET endpoints
+"/servid" // Dont know, but by name its serving id (not sure)
+"/getserverstate" // fast modpanel, explained in modpanel folder
+"/getroomlist" // shows data about all public rooms: whos inside and more
+"/getrandomavatar" // Getting random avatar, nothing hard, right?
+"/gettracklist" // getting track list (soundcloud)
+"/searchtrack" // searching track
+"/ytlinks.json" // JSON shows old videos which have been recorded by youtubers to show the Drawaria.online, now most of these videos are hidden/deleted for unknown reason
+"/countries/:lang.json" // Countries, language
+"/announcements/get" // (Somewhere in files i was talking about it as unkown, this is systemmessage3, discovered today in 02 of June, 2026)
+"/pageres/bannedwords_*.json" // Banned words (using to blur it with hearts)
+"/rules" // rules, read it
+"/avatar/cache/:id.jpg" // shows avatar by uid
+"/roompreviews/:id.jpg" // shows room canvas by roomid (if timestamp will be added, you can see something like of broadcast)
+"/modpanel" // We all know what is this :)
+"/gallery/img/:id" // Gallery drawing (changing by id)
+"/room/:id" // room, nothing else to see
+"/profile/?uid=..." // see profile by uid
+"/scoreboards/" // scoreboards
+"/gallery/" // gallery
+"/gallery/new" // gallery but in this endpoint it shows new drwaings
+"/avatar/builder/" // avatar builder
+"/rcon/:command" // rcon (admin commands) can be used though url and chat (ive left instructions in modpanel folder)
+"/discordlink" // link discord account to your drawaria.online account
+
+// POST endpoints
+"/saveplayername" // saving your player name
+"/uploadavatarimage" // uploading your avatar
+"/saveavatar" // saving your avatar
+"/reportplayer2" // reporting player by Report in player popuo
+"/canvasalert" // Send report (canvas)
+"/reporttrack" // report track
+"/addtrack" // add  track
+"/palettes/upload" // upload pallete
+"/rewardedvideos/sendreport" // A long of time ago rewarded videos was been in stencils, by button next to coins you was able to watch adveritement, and after this you would get 10 coins, now this feature is abandoned, but still can possible  to call :)
+"/snapshot/save" // save snaphot (ive left explanation in modpanel folder)
+"/checkfp" // check fingerprint (ive left explanation in modpanel folder)
+"/announcements/markread" // showing announcement as readed
+"/gallery/uploadimage/" // uploading iamge
+"/auth/facebook/" // login by facebook
+"/rewarddevideos/sendreport" // same feature, but shortened a little (ed)
+
+// Stuff
+"/3rd/lib/moveable.min.js"
+"/pageres/stencils.js"
+"/sound/*.mp3"
+"/img/*"
+"/countries/flags/*.svg"
+"/avatar/cache/*.jpg"
+"/roompreviews/*.jpg"
+"/favicon.ico"
