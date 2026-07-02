@@ -25,6 +25,7 @@ Here i will talk about endpoints of drawaria.online, and what they have inside.
 "/avatar/builder/" // avatar builder
 "/rcon/:command" // rcon (admin commands) can be used though url and chat (ive left instructions in modpanel folder)
 "/discordlink" // link discord account to your drawaria.online account
+"/event" // basically was an event, now this api is hidden, but you still can visit this site
 
 // POST endpoints
 "/saveplayername" // saving your player name
@@ -44,11 +45,11 @@ Here i will talk about endpoints of drawaria.online, and what they have inside.
 "/rewarddevideos/sendreport" // same feature, but shortened a little (ed)
 
 // Stuff
-"/3rd/lib/moveable.min.js"
-"/pageres/stencils.js"
-"/sound/*.mp3"
-"/img/*"
-"/countries/flags/*.svg"
-"/avatar/cache/*.jpg"
-"/roompreviews/*.jpg"
-"/favicon.ico"
+"/3rd/lib/moveable.min.js" // Stencils stickers, move, resize and etc
+"/pageres/stencils.js" // stencils
+"/sound/*.mp3" // play sound (afk, play and more
+"/img/*" // img
+"/countries/flags/*.svg" // shows countries in your profile popup
+
+
+P.S those are not all ap iendpoints, if time will come, ill publish more later
