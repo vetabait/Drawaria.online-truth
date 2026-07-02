@@ -140,8 +140,8 @@ Some of sockets that i found are not mentioned in some scripts, so they are goin
 
 // 14. mod actions
 42["clientnotify",-1,100,[2]]                   // show rules
--                  // request canvas
--             // respond with canvas
+42["clientnotify", "PLAYERID", 10001, []] // request canvas
+2["clientnotify", "id of player (maybe be removed)", 10002, ["data (usually img)"]]             // respond with canvas              (by this socket you can do nice tricks, thanks to cube3)
 42["bc_clientnotify",id,"Name",2,null]          // notification received
 42["bcuc_moderatormsg","text",true]             // moderator message
 42["bc_resetplayername",1,"Name of player"]     // reset name
