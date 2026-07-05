@@ -17,7 +17,7 @@ Some of sockets that i found are not mentioned in some scripts, so they are goin
 42["uc_chatmuted"]                              // Muted for spam
 42["bc_announcement","text"]                    // Dont know
 42["bc_extannouncement","text"]                 // Dont know
-- // Snapshot (cutted)
+42["uc_snapshot", snapshotId]                   // Snapshot creation
 
 // 3. player functions
 42["mc_roomplayerschange","join",[...],...]     // Player connect/disconnect
@@ -126,7 +126,7 @@ Some of sockets that i found are not mentioned in some scripts, so they are goin
 42["bc_pgdrawallow_vote",2,1,0,false,[1,0]]     // vote cast
 
 // 13. snapshot stuff
--   // create snapshot
+42["clientcmd", 330, ["Player name", "Msg"]]    // Snapshot creation (though chat)
 42["uc_snapshot","timestamp.id"]                // snapshot created
 
 
@@ -166,7 +166,7 @@ Some of sockets that i found are not mentioned in some scripts, so they are goin
 42["clientcmd",3,[flagId,true]]                 // set status flag
 42["clientcmd",2,[playerId,tokenIndex]]         // give token
 42["clientcmd",301,[0]]                         // vote option
--             // create snapshot
+42["clientcmd", 330, ["Player name", "Msg"]]    // create snapshot in the game (Shift + Right click, mentioned in modpanel folder)
 42["clientcmd",901,[fingerprint]]               // send fingerprint
 42["clientcmd",101,[]]                          // spawn avatar
 42["clientcmd",103,[pos,false]]                 // move avatar
