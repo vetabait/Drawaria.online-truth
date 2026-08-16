@@ -22,12 +22,8 @@ But there is plus from their modpanel
  opt_privateroom && (roomid = roomid.substring(0,24) + "000000000000") // for moderators your url of private room looks like this: https://drawaria.online/room/6c573c30-69b0000000000000000000000000
 
 
-So, the question comes
 
-Why i made this file if moderators cant see anything?
+(16 of august, 2026)
 
-There is an expection:
-If they have blocked ui, it doesnt mean that they cant have full access to it
-They can change values from disabled to enabled, true - false, and use rcon commands, because there is nothing written about rcon and private room
-So this is just small ui protection, but if somebody wants, they can change values - and kaboom
+Moderators can see private rooms, I will show the whole document later.
 
