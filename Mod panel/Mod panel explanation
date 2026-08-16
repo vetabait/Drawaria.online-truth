@@ -1,7 +1,7 @@
 
-The moderator's journey starts from a simple site - drawaria.online/getserverstate
+The moderator's journey starts from a simple site - drawaria.online/modpanel
 
-          drawaria.online/getserverstate
+          drawaria.online/modpanel
 
 
 Site loads a quick rooms list, where moderators can see:
@@ -13,7 +13,7 @@ Site loads a quick rooms list, where moderators can see:
 - Players hash
 - Players country
 
-Also in getserverstate they can do the same as moderators in other platform
+Also in modpanel they can do the same as moderators in other platform
 
 
 - Message to player from moderator (The message will be seen for him only)
@@ -24,14 +24,14 @@ This site was made just to see rooms quickly.
 
 ------------------------------------------------- MOD MENU ------------------------------------------------
 
-Basically lets explain how moderators can do a lot of stuff with players, when in getserverstate they can do only three actions
+Basically lets explain how moderators can do a lot of stuff with players, when in modpanel they can do only three actions
 
 https://drawaria.online/modpanel?server=3&room=(Room id)&player=(id of player)&openmenu=(1 or 0)
 
 The menu can be opened by changing url data or Ctrl + Shift + click on a player
 
-by changing openmenu= to 0 youre just seeing the room, without moderator tools (Like a snapshot)
-by changing openmenu= to 1 youre you can see room and moderator tools
+by changing openmenu= to 0 site is redicting you to exactly room from your url. (Without special tools like Create a snapshot and more)
+by changing openmenu= to 1 site is redicting you to exactly room from your URL, but with all tools.
 
 In moderators tools by RCON they can:
 
