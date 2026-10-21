@@ -185,3 +185,64 @@ Gallery stuff:
 "/friends""
 "*?uid="
 "/me // redirects to your friends"
+-----------------------------------------------------------------------------------------
+
+/modpanel
+*/getserverstate
+*/manage
+*/rcon 
+
+
+
+/snd
+https://drawaria.online/snd/guess.mp3
+https://drawaria.online/snd/tick.mp3
+https://drawaria.online/snd/selword.mp3
+https://drawaria.online/snd/otherguess.mp3
+https://drawaria.online/snd/turnresults.mp3
+https://drawaria.online/snd/turnaborted.mp3
+https://drawaria.online/snd/startdraw.mp3
+/img 
+https://drawaria.online/img/pattern.png https://drawaria.online/img/cooltext311071855425151.png https://drawaria.online/img/coin.png 
+https://drawaria.online/img/marks/1.png 
+https://drawaria.online/img/marks/2.png 
+https://drawaria.online/img/black-male-user-symbol.png
+https://drawaria.online/img/icons8-play-button-48.png
+https://drawaria.online/img/icons8-medal-first-place-48.png
+https://drawaria.online/img/28174a34e77bb5e5310ced9f95cb480b.png
+https://drawaria.online/img/dot0.png
+https://drawaria.online/img/dot1.png
+https://drawaria.online/img/dot2.png
+https://drawaria.online/img/gestures/ezgif-1-db71003aad95.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-47669e16a3d8.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-24b893f855c0.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-d402901a06fe.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-45ae99c41cd5.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-f65dd98ef094.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-4adb0ab9c585.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-d5b70ebd8087.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-bb0dfb9f448d.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-dc75a16ba7ca.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-97414e759778.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-d9c87743a43f.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-928fdfaf0aa3.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-e606a5c08e97.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-82c8345f6b6e.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-a3d2b8fa892e.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-4606d2bc27e1.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-779847d64ad3.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-c602ed1758dc.png // .gif
+https://drawaria.online/img/gestures/ezgif-1-87044c6534f9.png // .gif
+/extimages
+https://drawaria.online/extimages/MegusDungeonDrawariaBanner.png
+https://drawaria.online/extimages/youtube.jpg https://drawaria.online/extimages/drawaria.png 
+https://drawaria.online/extimages/d7d1c634d3d37feaead895c1001c7f6d_thumb_500_500.jpg
+https://drawaria.online/extimages/3%E7%BB%BF.jpg // chinese character using an encoding (such as GBK or non-standard UTF-8) 
+https://drawaria.online/extimages/8.jpg
+https://drawaria.online/extimages/1610683537d15fe27b500a4bfc.png 
+/images
+https://galleryhost2-cf.drawaria.online/images/*.jpg
+https://drawaria.online/event/images/3-E7-BB-BF.jpg
+
+/pageres
+https://drawaria.online/pageres/friends.js https://drawaria.online/pageres/friends.css https://drawaria.online/pageres/comments.js https://drawaria.online/pageres/comments.css https://drawaria.online/pageres/palettes.js https://drawaria.online/pageres/common.js https://drawaria.online/pageres/uidheader.js https://drawaria.online/pageres/avataranimations.css https://drawaria.online/pageres/snapshot.js https://drawaria.online/pageres/modpanel.js https://drawaria.online/pageres/stencils.js https://drawaria.online/pageres/bannedwords_en.json https://drawaria.online/pageres/login.js
