@@ -4,13 +4,13 @@ Here i will talk about endpoints of drawaria.online, and what they have inside.
 // GET endpoints
 "/servid" // Dont know, but by name its serving id (not sure)
 "/getserverstate" // fast modpanel, explained in modpanel folder
-"/getroomlist" // shows data about all public rooms: whos inside and more
+"/getroomlist" // Taking information from public rooms, especially: (roomId, currentPlayers, maxPlayers, roomName, roomType, tickTimestamp, flagsArray, languageId, customWordsConfig)
 "/getrandomavatar" // Getting random avatar, nothing hard, right?
 "/gettracklist" // getting track list (soundcloud)
 "/searchtrack" // searching track
 "/ytlinks.json" // JSON shows old videos which have been recorded by youtubers to show the Drawaria.online, now most of these videos are hidden/deleted for unknown reason
 "/countries/:lang.json" // Countries, language
-"/announcements/get" // (Somewhere in files i was talking about it as unkown, this is systemmessage3, discovered today in 02 of June, 2026)
+"/announcements/get" // (Somewhere in files i was talking about it as unknown, this is systemmessage3, discovered today in 02 of June, 2026)
 "/pageres/bannedwords_*.json" // Banned words (using to blur it with hearts)
 "/rules" // rules, read it
 "/avatar/cache/:id.jpg" // shows avatar by uid
@@ -51,5 +51,137 @@ Here i will talk about endpoints of drawaria.online, and what they have inside.
 "/img/*" // img
 "/countries/flags/*.svg" // shows countries in your profile popup
 
+// Avatar builder
 
-P.S those are not all ap iendpoints, if time will come, ill publish more later
+-face
+https://drawaria.online/avatar/builder/assets/face_base.png
+https://drawaria.online/avatar/builder/assets/face_cowboy.png
+https://drawaria.online/avatar/builder/assets/face_angry.png
+https://drawaria.online/avatar/builder/assets/face_scared.png
+https://drawaria.online/avatar/builder/assets/face_clown.png
+https://drawaria.online/avatar/builder/assets/face_cat.png
+https://drawaria.online/avatar/builder/assets/face_woman.png
+https://drawaria.online/avatar/builder/assets/face_man.png
+https://drawaria.online/avatar/builder/assets/face_baby.png
+https://drawaria.online/avatar/builder/assets/face_alien.png
+-eye
+https://drawaria.online/avatar/builder/assets/eye_normal.png
+https://drawaria.online/avatar/builder/assets/eye_normal_small.png
+https://drawaria.online/avatar/builder/assets/eye_grinning_big.png
+https://drawaria.online/avatar/builder/assets/eye_beaming.png
+https://drawaria.online/avatar/builder/assets/eye_raised.png
+https://drawaria.online/avatar/builder/assets/eye_neutral.png
+https://drawaria.online/avatar/builder/assets/eye_sleeping.png
+https://drawaria.online/avatar/builder/assets/eye_squinting.png
+https://drawaria.online/avatar/builder/assets/eye_surprised.png
+https://drawaria.online/avatar/builder/assets/eye_sad.png
+https://drawaria.online/avatar/builder/assets/eye_disappointed.png
+https://drawaria.online/avatar/builder/assets/eye_angry.png
+https://drawaria.online/avatar/builder/assets/eye_thinking_l.png
+https://drawaria.online/avatar/builder/assets/eye_thinking_r.png
+https://drawaria.online/avatar/builder/assets/eye_skeptical_l.png
+https://drawaria.online/avatar/builder/assets/eye_skeptical_r.png
+https://drawaria.online/avatar/builder/assets/eye_winking_l.png
+https://drawaria.online/avatar/builder/assets/eye_winking_r.png
+https://drawaria.online/avatar/builder/assets/eye_smirking_l.png
+https://drawaria.online/avatar/builder/assets/eye_smirking_r.png
+https://drawaria.online/avatar/builder/assets/eye_weary.png
+https://drawaria.online/avatar/builder/assets/eye_frustrated.png
+https://drawaria.online/avatar/builder/assets/eye_pleased.png
+https://drawaria.online/avatar/builder/assets/eye_joy.png
+https://drawaria.online/avatar/builder/assets/eye_relieved.png
+https://drawaria.online/avatar/builder/assets/eye_sleepy.png
+https://drawaria.online/avatar/builder/assets/eye_pensive.png
+https://drawaria.online/avatar/builder/assets/eye_crossed.png
+https://drawaria.online/avatar/builder/assets/eye_open.png
+https://drawaria.online/avatar/builder/assets/eye_open_small.png
+https://drawaria.online/avatar/builder/assets/eye_open_large.png
+https://drawaria.online/avatar/builder/assets/eye_rolling.png
+https://drawaria.online/avatar/builder/assets/eye_pleading.png
+https://drawaria.online/avatar/builder/assets/eye_clown.png
+https://drawaria.online/avatar/builder/assets/eye_star.png
+https://drawaria.online/avatar/builder/assets/eye_heart.png
+https://drawaria.online/avatar/builder/assets/eye_alien.png
+https://drawaria.online/avatar/builder/assets/eye_robot.png
+-mouth
+https://drawaria.online/avatar/builder/assets/mouth_smiling.png
+https://drawaria.online/avatar/builder/assets/mouth_open_smiling_small.png
+https://drawaria.online/avatar/builder/assets/mouth_open_smiling.png
+https://drawaria.online/avatar/builder/assets/mouth_grinning.png
+https://drawaria.online/avatar/builder/assets/mouth_beaming.png
+https://drawaria.online/avatar/builder/assets/mouth_small_raised.png
+https://drawaria.online/avatar/builder/assets/mouth_smirking.png
+https://drawaria.online/avatar/builder/assets/mouth_wavy.png
+https://drawaria.online/avatar/builder/assets/mouth_grimacing.png
+https://drawaria.online/avatar/builder/assets/mouth_neutral.png
+https://drawaria.online/avatar/builder/assets/mouth_neutral_small.png
+https://drawaria.online/avatar/builder/assets/mouth_confounded.png
+https://drawaria.online/avatar/builder/assets/mouth_thinking.png
+https://drawaria.online/avatar/builder/assets/mouth_confused.png
+https://drawaria.online/avatar/builder/assets/mouth_sad_hanging.png
+https://drawaria.online/avatar/builder/assets/mouth_unamused.png
+https://drawaria.online/avatar/builder/assets/mouth_disappointed.png
+https://drawaria.online/avatar/builder/assets/mouth_sleepy.png
+https://drawaria.online/avatar/builder/assets/mouth_open_frowning.png
+https://drawaria.online/avatar/builder/assets/mouth_frowning.png
+https://drawaria.online/avatar/builder/assets/mouth_weary.png
+https://drawaria.online/avatar/builder/assets/mouth_sleeping.png
+https://drawaria.online/avatar/builder/assets/mouth_open.png
+https://drawaria.online/avatar/builder/assets/mouth_open_large.png
+https://drawaria.online/avatar/builder/assets/mouth_open_wide.png
+https://drawaria.online/avatar/builder/assets/mouth_kissing.png
+https://drawaria.online/avatar/builder/assets/mouth_nerd.png
+https://drawaria.online/avatar/builder/assets/mouth_drooling.png
+https://drawaria.online/avatar/builder/assets/mouth_tongue_sticking_out.png
+https://drawaria.online/avatar/builder/assets/mouth_skewed_with_tongue.png
+https://drawaria.online/avatar/builder/assets/mouth_tongue_hanging_out.png
+https://drawaria.online/avatar/builder/assets/mouth_alien.png
+https://drawaria.online/avatar/builder/assets/mouth_clown.png
+https://drawaria.online/avatar/builder/assets/mouth_robot.png
+-accessories
+https://drawaria.online/avatar/builder/assets/acc_blush.png
+https://drawaria.online/avatar/builder/assets/acc_hand_thinking.png
+https://drawaria.online/avatar/builder/assets/acc_hand_covering_lips.png
+https://drawaria.online/avatar/builder/assets/acc_hand_covering_mouth.png
+https://drawaria.online/avatar/builder/assets/acc_hand_hugging.png
+https://drawaria.online/avatar/builder/assets/acc_hand_holding_face.png
+https://drawaria.online/avatar/builder/assets/acc_lying_nose.png
+https://drawaria.online/avatar/builder/assets/acc_human_nose.png
+https://drawaria.online/avatar/builder/assets/acc_clown_nose.png
+https://drawaria.online/avatar/builder/assets/acc_robot_nose.png
+https://drawaria.online/avatar/builder/assets/acc_party_horn.png
+https://drawaria.online/avatar/builder/assets/acc_party_hat.png
+https://drawaria.online/avatar/builder/assets/acc_glasses.png
+https://drawaria.online/avatar/builder/assets/acc_sunglasses.png
+https://drawaria.online/avatar/builder/assets/acc_monocle.png
+https://drawaria.online/avatar/builder/assets/acc_blowing_heart.png
+https://drawaria.online/avatar/builder/assets/acc_steam.png
+https://drawaria.online/avatar/builder/assets/acc_sleeping.png
+https://drawaria.online/avatar/builder/assets/acc_monkey_hand_see.png
+https://drawaria.online/avatar/builder/assets/acc_monkey_hand_speak.png
+https://drawaria.online/avatar/builder/assets/acc_monkey_hand_hear.png
+
+-------------------------------------------------------------------------------------------
+Gallery stuff:
+
+"/gallery" // The main gallery website, no shit sherlock holmes!
+"*/hot" // Drawings which have nice amount of likes
+"*/new" // New drawings
+"*/top" // Just go and take a look.
+"*/picks" // "Community" picks
+"*/?deletedbymod=1"  // This feature can let you see deleted drawings (EVEN IF YOURE A PLAYER), have fun :)
+"*/getimages"  //  ?page=(number),&uid=(playeruid),&imageid=(id),&sort=(hot,new,top,picks),&modefilter=(vanilla,stencils,atools,pixelart) // With this you can get any information from drawing
+"*&filter=*" // vanilla,stencils,atools,pixelart // filtering drawing.
+"*?uid=" // Profile.
+"https://drawaria.online/gallery/rateimage" // 1 like 2 dislike 
+"https://drawaria.online/gallery/deleteimage" // (Remove Image As Owner As Moderator)
+ "https://drawaria.online/gallery/modaction" // (Add to Community Picks, Do not filter out, Remove from Commutiny Picks, Delete Image, Restore Image, Delete and Ban Uploader) 
+ "https://drawaria.online/gallery/setimagedetails" // (Title,Description,Tags)
+"https://drawaria.online/gallery/gettags" // (When you write a tag suggestions will show up)
+"/gallery/tag "
+"https://drawaria.online/gallery/tag/" // (Will find images with specific tag) 
+"/palettes"
+"*/?page="  
+"/friends""
+"*?uid="
+"/me // redirects to your friends"
